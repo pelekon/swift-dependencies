@@ -22,7 +22,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(url: "https://github.com/apple/swift-syntax", "509.0.0"..<"511.0.0"),
+    .package(url: "https://github.com/sjavora/swift-syntax-xcframeworks.git", from: "509.0.2"),
     .package(url: "https://github.com/google/swift-benchmark", from: "0.1.0"),
     .package(url: "https://github.com/pointfreeco/combine-schedulers", from: "1.0.0"),
     .package(url: "https://github.com/pointfreeco/swift-clocks", from: "1.0.0"),
@@ -62,8 +62,7 @@ let package = Package(
     .macro(
       name: "DependenciesMacrosPlugin",
       dependencies: [
-        .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
-        .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxWrapper", package: "swift-syntax-xcframeworks")
       ]
     ),
     .executableTarget(
