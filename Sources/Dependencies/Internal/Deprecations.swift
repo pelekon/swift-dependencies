@@ -30,16 +30,16 @@ extension ActorIsolated {
     deprecated,
     message: "Use the non-async version of 'withValue'."
   )
-  public func withValue<T>(
+  public func withValue<T: Sendable>(
     _ operation: @Sendable (inout Value) async throws -> T
-  ) async rethrows -> T {
+  ) async rethrows -> T where Value: Sendable {
     var value = self.value
     defer { self.value = value }
     return try await operation(&value)
   }
 }
 
-extension AsyncStream {
+extension AsyncStream where Element: Sendable {
   @available(
     *,
     deprecated,
@@ -48,7 +48,7 @@ extension AsyncStream {
   public init<S: AsyncSequence & Sendable>(
     _ sequence: S,
     bufferingPolicy limit: Continuation.BufferingPolicy
-  ) where S.Element == Element {
+  ) where S.Element == Element, S.Element: Sendable {
     self.init(bufferingPolicy: limit) { (continuation: Continuation) in
       let task = Task {
         do {
@@ -68,7 +68,7 @@ extension AsyncStream {
   }
 }
 
-extension AsyncThrowingStream where Failure == Error {
+extension AsyncThrowingStream where Element: Sendable, Failure == Error {
   @available(
     *,
     deprecated,
@@ -77,7 +77,7 @@ extension AsyncThrowingStream where Failure == Error {
   public init<S: AsyncSequence & Sendable>(
     _ sequence: S,
     bufferingPolicy limit: Continuation.BufferingPolicy
-  ) where S.Element == Element {
+  ) where S.Element == Element, S.Element: Sendable {
     self.init(bufferingPolicy: limit) { (continuation: Continuation) in
       let task = Task {
         do {
@@ -112,7 +112,7 @@ extension DependencyValues {
   }
 
   @available(*, deprecated, message: "Use 'withDependencies' instead.")
-  public static func withValue<Value, R>(
+  public static func withValue<Value, R: Sendable>(
     _ keyPath: WritableKeyPath<DependencyValues, Value>,
     _ value: @autoclosure () -> Value,
     operation: () async throws -> R
@@ -133,7 +133,7 @@ extension DependencyValues {
   }
 
   @available(*, deprecated, message: "Use 'withDependencies' instead.")
-  public static func withValues<R>(
+  public static func withValues<R: Sendable>(
     _ updateValuesForOperation: (inout Self) throws -> Void,
     operation: () async throws -> R
   ) async rethrows -> R {
@@ -149,7 +149,7 @@ extension DependencyValues {
   }
 
   @available(*, deprecated, message: "Use 'withDependencies' instead.")
-  public static func withTestValues<R>(
+  public static func withTestValues<R: Sendable>(
     _ updateValuesForOperation: (inout Self) async throws -> Void,
     assert operation: () async throws -> R
   ) async rethrows -> R {
